@@ -1,0 +1,21 @@
+{
+  "apps": [
+    {
+      "name": "datawin-api",
+      "cwd": "/home/ubuntu/sites/datawin-api",
+      "out_file": "/home/ubuntu/logs/datawin-api.log",
+      "error_file": "/home/ubuntu/logs/datawin-api_error.log",
+      "pid_file": "/home/ubuntu/pids/datawin-api.pid",
+      "script": "npm",
+      "merge_logs": true,
+      "args": "start",
+      "watch": false,
+      "node_args": "",
+      "instances": "1",
+      "exec_mode": "fork_mode",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}
