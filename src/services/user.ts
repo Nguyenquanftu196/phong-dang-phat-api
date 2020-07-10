@@ -7,7 +7,7 @@ import { BadRequestError, NotFoundError, ForbiddenError } from '../utils/errors'
 import { UserStatus } from '../constants/users';
 import { DEFAULT_LIMIT } from '../constants/collections';
 
-const { Users, RawPlayerHistory } = getModels(MySQLClient);
+const { Users } = getModels(MySQLClient);
 
 export class UserServices {
   static createAdmin = async () => {

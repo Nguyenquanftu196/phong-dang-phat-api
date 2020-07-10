@@ -3,13 +3,15 @@ import uuid from 'uuid/v4';
 import sharp from 'sharp';
 import { uploadFile, downloadFile } from '../utils/file';
 import { BadRequestError } from '../utils/errors';
+import { promises as fs } from 'fs';
+import path from 'path';
+
+const pathSaveFileProduct = path.join(__dirname, '/../../resources/image_product')
 
 const FILE_CONFIG: any = {
   content: {
-    PLAYER_AVATAR: 'upload/player/avatar',
-    TEAM_LOGO: 'upload/team/logo',
-    NATION_FLAG: 'upload/nation/flag',
-    TITLE: 'upload/title/image'
+    AD_IMAGES: 'upload/product',
+    USER_AVATAR: 'upload/user/avatar',
   },
   dimension: {
     ORIGINAL: 'original',
@@ -19,7 +21,8 @@ const FILE_CONFIG: any = {
   },
 };
 
-const resizeAndUploadSingle = async (fileName: any, buffer: any, fileType: any) => {
+const resizeAndUploadSingle = async (buffer: any, fileType: any) => {
+  const fileName = uuid();
   if (!FILE_CONFIG.content[fileType.toUpperCase()]) {
     throw new BadRequestError({ field: 'filename', message: `${fileType.toUpperCase()} not found.` });
   }
@@ -32,55 +35,28 @@ const resizeAndUploadSingle = async (fileName: any, buffer: any, fileType: any) 
   return fileName;
 };
 
-const upload = (files: any, fileType: any) => Promise
-  .all(map(files, async file => resizeAndUploadSingle(file.teamId, file.buffer, fileType.toUpperCase())));
+// const upload = async (files: any, fileType: any) => await Promise.all(map(files, async file => {
+//   console.log('vao day 1: ', files.length);
+  
+//   return resizeAndUploadSingle(file.buffer, fileType.toUpperCase())
+// }));
 
-const uploadLogoFromUrl = async (fileName: any, url: any) => {
-  const buffer = await downloadFile(url);
-  return resizeAndUploadSingle(fileName, buffer, 'TEAM_LOGO');
-};
-
-const uploadTitleFromUrl = async (fileName: any, url: any) => {
-  const buffer = await downloadFile(url);
-  return resizeAndUploadSingle(fileName, buffer, 'TITLE');
-};
-
-const uploadFlagFromUrl = async (fileName: any, url: any) => {
-  const buffer = await downloadFile(url);
-  return resizeAndUploadSingle(fileName, buffer, 'NATION_FLAG');
-};
-
-const uploadPlayerAvatar = async (files: any) => {
-  await Promise.all(map(files, async file => {
-    file.buffer = await downloadFile(file.image);
-  }));
-  await upload(files, 'PLAYER_AVATAR');
-};
-
-const uploadTeamLogo = async (files: any) => {
-  await Promise.all(map(files, async file => {
-    file.buffer = await downloadFile(`https://tmssl.akamaized.net//images/wappen/big/${file.teamId}.png?lm=1458585362`);
-  }));
-  await upload(files, 'TEAM_LOGO');
-};
-
-const uploadFromUrl = async (fileName: any, url: any) => {
+const upload = async (files: any, fileType: any) => {
   try {
-    const buffer = await downloadFile(url);
-    return resizeAndUploadSingle(fileName, buffer, 'AD_IMAGES');
+    let listFile: any = []
+    await Promise.all(map(files, async file => {
+      const fileName = uuid();
+      const originalJPEG = await sharp(file.buffer).rotate().png().toBuffer();
+      await fs.writeFile(`${pathSaveFileProduct}/${fileName}.png`, originalJPEG)
+      listFile.push(fileName)
+    }))
+    return listFile
   } catch (e) {
     console.log(e);
-    return null;
   }
-};
+}
 
 export default {
   upload,
-  uploadLogoFromUrl,
-  uploadFlagFromUrl,
-  uploadFromUrl,
-  uploadPlayerAvatar,
-  uploadTeamLogo,
-  uploadTitleFromUrl,
   FILE_CONFIG,
 };

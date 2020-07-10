@@ -16,6 +16,8 @@ import { MySQLClient } from './clients/mysql';
 import { getModels } from './models/db.tables';
 import { UserController } from './controllers/users';
 import { notFoundMiddleware, errorHandler } from './utils/errors';
+import { ProductController } from './controllers/product'
+import { CategoriesController } from './controllers/categories'
 
 const compare = require('tsscmp');
 const auth = require('basic-auth');
@@ -29,6 +31,8 @@ app.get('/mysql', async (req, res) => {
   await MySQLClient.sync();
   res.json({ message: 'MySQL reset' });
 });
+
+app.use(express.static('../resources/image_product/:id'))
 
 // Express configuration
 app.set('trust proxy', process.env.USE_PROXY === 'true');
@@ -51,15 +55,18 @@ app.use(initLanguages());
 
 // Allow to generate anonymous JWT for new user
 app.post('/auth/anonymous', AuthCtrl.anonymous);
+app.get("/product", ProductController.list)
+app.put("/view/product/:id", ProductController.viewAd)
+app.get("/category", CategoriesController.list)
 
-function check(name, pass) {
+function check(name: any, pass: any) {
   var valid = true;
 
   valid = compare(name, 'root') && valid;
   valid = compare(pass, 'root') && valid;
   return valid;
 }
-const basicAuth = (req, res, next) => {
+const basicAuth = (req: any, res: any, next: any) => {
   const user = auth(req);
   if (!user || !check(user.name, user.pass)) {
     res.statusCode = 401;

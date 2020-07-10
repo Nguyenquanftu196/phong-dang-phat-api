@@ -50,7 +50,7 @@
     "random-ua": "0.0.6",
     "request-promise-native": "^1.0.7",
     "sequelize": "^4.44.3",
-    "sharp": "^0.24.0",
+    "sharp": "^0.24.1",
     "socks5-http-client": "^1.0.4",
     "socks5-https-client": "^1.2.1",
     "ts-node": "^7.0.1",
